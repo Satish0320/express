@@ -1,0 +1,88 @@
+const express=require("express")
+const app = express();
+
+var users=[{
+    name: "satish",
+    kidneys:[{
+        healthy: true
+    },{
+        healthy: false
+    }]
+}]
+
+app.use(express.json());
+
+
+app.get('/',(req,res)=>{ 
+    const satishkidneys= users[0].kidneys;
+    const Nofkidneys= satishkidneys.length
+    // console.log(satishkidneys)
+    // console.log(Nofkidneys)
+    let Nofhealthykidneys = 0;
+    for(let i=0 ; i<satishkidneys.length; i++){
+        if(satishkidneys[i].healthy){
+            Nofhealthykidneys = Nofhealthykidneys+1;
+        }
+    }
+   const Nofunhealthykidneys = Nofkidneys - Nofhealthykidneys;
+   res.json({
+    satishkidneys,
+    Nofkidneys,
+    Nofhealthykidneys,
+    Nofunhealthykidneys
+   })
+})
+
+app.post("/", (req,res)=>{
+      // add a kidney
+      const ishealthy = req.body.ishealthy;
+      users[0].kidneys.push({
+        healthy: ishealthy
+      })
+      res.json({
+        msg: "DONE!"
+      })
+})
+
+
+app.put("/",(req,res)=>{
+    for(let i = 0;i<users[0].kidneys.length;i++){
+        users[0].kidneys[i].healthy=true;
+    }
+    res.json({
+        msg: "Done put!"
+    })
+})
+
+app.delete("/",(req,res)=>{
+    if(isthereatleastoneunhealthykidney()){ 
+        const newkidney = [];
+        for(let i = 0;i<users[0].kidneys.length;i++){
+         if(users[0].kidneys[i].healthy){
+             newkidney.push({
+                 ishealthy: true
+             })
+         }
+        }
+        users[0].kidneys = newkidney;
+        res.json({
+         msg: "DONE DELETE!"
+        })
+    } else{
+        res.status(411).json({
+            msg:"DONE STATUS!"
+        })
+    }
+ })
+    
+
+function isthereatleastoneunhealthykidney(){
+    let atleastoneunhealthykidney=false;
+   for(let i = 0;i<users[0].kidneys.length;i++){
+    if(!users[0].kidneys[i].healthy){
+        atleastoneunhealthykidney = true
+    }
+    }
+    return atleastoneunhealthykidney
+    }
+app.listen(3005);
